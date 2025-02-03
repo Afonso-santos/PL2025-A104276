@@ -1,7 +1,7 @@
 # PL2025-A104276
 
 
-![Afonso Dionísio ](Afonso.jpg)  
+![Afonso Dionísio ](profile.jpg)  
 
 ## 📌 Identificação  
 - **Nome:** Afonso Dionísio Santos
