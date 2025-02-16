@@ -3,6 +3,7 @@
 2025-02-07
 
 ## Autor:
+![Afonso Dionísio ](../profile.jpg)  
 - Afonso Dionísio Santos
 - A104276
 
