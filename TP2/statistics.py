@@ -5,34 +5,6 @@ COMPOSITOR = 4
 OBRA = 0
 PERIODO = 3
 
-# def parse_csv(content):
-#     """Parses CSV content manually, handling quoted fields and semicolon delimiters."""
-#     rows = []
-#     current_row = []
-#     inside_quotes = False
-#     field = ""
-
-#     for char in content:
-#         if char == '"':
-#             inside_quotes = not inside_quotes  # Toggle quote state
-#         elif char == '\n' and not inside_quotes:
-#             current_row.append(field.strip())
-#             rows.append(current_row)
-#             current_row = []
-#             field = ""
-#         elif char == ';' and not inside_quotes:
-#             current_row.append(field.strip())
-#             field = ""
-#         else:
-#             field += char
-
-#     if field:
-#         current_row.append(field.strip())
-#     if current_row:
-#         rows.append(current_row)
-
-#     return rows[1:]  # Skip header row
-
 def parse_csv(content):
     rows = []
     current_row = []
@@ -146,13 +118,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-# == Distribuição por período ==
-# Barroco: 26
-# Clássico: 15
-# Medieval: 48
-# Renascimento: 41
-# Século XX: 18
-# Romântico: 19
-# Contemporâneo: 7
