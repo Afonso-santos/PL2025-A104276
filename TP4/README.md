@@ -1,4 +1,4 @@
-# TPC3: Analisador Léxico para Consultas SPARQL
+# TPC4: Analisador Léxico para Consultas SPARQL
 
 2025-03-01
 
