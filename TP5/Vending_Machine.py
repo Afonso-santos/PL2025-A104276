@@ -19,41 +19,60 @@ t_ignore = ' \t\n'
 
 def t_LISTAR(t): r'(?i)LISTAR'; return t
 def t_SAIR(t): r'(?i)SAIR'; return t
-
 def t_SELECIONAR(t): r'(?i)SELECIONAR[ ]+[a-zA-Z0-9]+'; return t
-
 def t_MOEDA(t): r'(?i)MOEDA\s+((1e|2e|50c|20c|10c|5c|2c|1c),?\s*)+'; return t
 def t_NOTA(t): r'(?i)NOTA\s+([5e|10e|20e|50e|100e|200e|500e],?\s*)+'; return t
 def t_error(t):
     print(f"Illegal character '{t.value[0]}' at position {t.lexpos}")
     t.lexer.skip(1)
 
-
-def LISTAR()-> None: 
+def LISTAR():
     print('     Number        |            Name                               |       Stock      |    Price    ')
     print('--------------------------------------------------------------------------------------------------------')
     for product in stock.values():
         print(f"        {product['cod']}        |        {product['nome']: <30}         |      {product['quant']: <5}       |      {product['preco']: <5}")
 
 def TROCO(saldo: float) -> str:
-    notes = {50: "50e", 20: "20e", 10: "10e", 5: "5e"}
-    coins = {2: "2e", 1: "1e", 0.50: "50c", 0.20: "20c", 0.10: "10c", 0.05: "5c", 0.02: "2c", 0.01: "1c"}
-    
+    notes_order = [50.00, 20.00, 10.00, 5.00]
+    coins_order = [2.00, 1.00, 0.50, 0.20, 0.10, 0.05, 0.02, 0.01]
     troco_count = {}
 
-    for value in sorted(list(notes.keys()) + list(coins.keys()), reverse=True):
+    for value in notes_order + coins_order:
         while saldo >= value:
-            saldo = round(saldo - value, 2)  # Avoid floating-point precision errors
-            troco_count[value] = troco_count.get(value, 0) + 1
+            if value in notes_order:
+                note = next((n for n in notes.values() if n["valor"] == value), None)
+                if note and note["quant"] > 0:
+                    note["quant"] -= 1
+                    saldo = round(saldo - value, 2)
+                    troco_count[value] = troco_count.get(value, 0) + 1
+                else:
+                    break
+            else:
+                coin = next((c for c in coins.values() if c["valor"] == value), None)
+                if coin and coin["quant"] > 0:
+                    coin["quant"] -= 1
+                    saldo = round(saldo - value, 2)
+                    troco_count[value] = troco_count.get(value, 0) + 1
+                else:
+                    break
 
-    # Create the output string
-    troco_str_parts = [f"{count}x {coins.get(value, notes.get(value))}" for value, count in troco_count.items()]
-    troco_str = ", ".join(troco_str_parts[:-1]) + (" e " + troco_str_parts[-1] if len(troco_str_parts) > 1 else "")
+    troco_str_parts = []
+    for value, count in troco_count.items():
+        if value in notes_order:
+            denomination = f"{int(value)}e"
+        else:
+            if value in [1.00, 2.00]:
+                denomination = f"{int(value)}e"
+            else:
+                cents = int(value * 100)
+                denomination = f"{cents}c"
+        troco_str_parts.append(f"{count}x {denomination}")
 
-    return troco_str
+    if not troco_str_parts:
+        return "Sem troco disponível."
+    return ", ".join(troco_str_parts[:-1]) + (" e " + troco_str_parts[-1] if len(troco_str_parts) > 1 else troco_str_parts[0])
 
-
-def vending_machine() -> None:
+def vending_machine(file_path: str):
     print(f"maq: {date.today()} Stock carregado, Estado atualizado.")
     print("maq: Bom dia. Estou disponível para atender o seu pedido")
     lexer = lex.lex()
@@ -65,97 +84,102 @@ def vending_machine() -> None:
         for token in lexer:
             if token.type == "LISTAR":
                 LISTAR()
-
+                
             elif token.type == "SELECIONAR":
-                cod = token.value.split()[1]  
+                cod = token.value.split()[1]
                 product = stock.get(cod)
+                if not product:
+                    print(f"Produto não encontrado.")
+                    continue
                 if saldo == 0:
-                    print(f"O Preço do produto é: {product['preco']}€")
+                    print(f"O Preço do produto é: {product['preco']:.2f}€")
                     continue
-
-                elif saldo < product["preco"]:
-                    print(f"maq: Saldo insufuciente para satisfazer o seu pedido.")
-                    print(f"maq: Saldo = {saldo}€ Pedido = {product['preco']}€")
+                if saldo < product["preco"]:
+                    print(f"maq: Saldo insuficiente para satisfazer o seu pedido.")
+                    print(f"maq: Saldo = {saldo:.2f}€ Pedido = {product['preco']:.2f}€")
                     continue
-                elif product["quant"] == 0:
+                if product["quant"] == 0:
                     print(f"Produto esgotado.")
                     continue
-
-                print(f"Produto: {product['nome']} - {product['preco']:.2f}€")
                 product["quant"] -= 1
                 saldo -= product["preco"]
+                print(f"Produto: {product['nome']} - {product['preco']:.2f}€")
                 print(f"Saldo restante: {saldo:.2f}€")
-
-           
             elif token.type == "MOEDA":
-                moedas_str = " ".join(token.value.split()[1:]) #create a single string.
-                moedas = moedas_str.split(",") #split the string by commas.
+                moedas_str = " ".join(token.value.split()[1:])
+                moedas = moedas_str.split(",")
                 for moeda in moedas:
                     moeda = moeda.strip()
                     if moeda:
                         if moeda.endswith('e'):
-                            saldo += int(moeda[:-1]) 
+                            valor = int(moeda[:-1])
+                            coin = next((c for c in coins.values() if c["valor"] == valor), None)
+                            if coin:
+                                coin["quant"] += 1
+                            saldo += valor
                         elif moeda.endswith('c'):
-                            saldo += int(moeda[:-1])/100
-
+                            cents = int(moeda[:-1])
+                            valor = cents / 100.0
+                            coin = next((c for c in coins.values() if c["valor"] == valor), None)
+                            if coin:
+                                coin["quant"] += 1
+                            saldo += valor
                 print(f"Saldo: {saldo:.2f}€")
-            
             elif token.type == "NOTA":
                 notas_str = " ".join(token.value.split()[1:])
                 notas = notas_str.split(",")
                 for nota in notas:
                     nota = nota.strip()
                     if nota:
-                        if nota.endswith('e') and int(nota[:-1]) > 20:
-                            saldo = 0
-                            print("Nota inválida. Adicione notas de 5, 10 ou 20)")
-                            continue
-                        elif nota.endswith('e'):
-                            saldo += int(nota[:-1])
-                    
-                        print(f"Saldo: {saldo:.2f}€")
-
+                        if nota.endswith('e'):
+                            valor_str = nota[:-1]
+                            valor = int(valor_str)
+                            if valor not in [5, 10, 20]:
+                                print(f"Nota inválida. Adicione notas de 5, 10 ou 20.")
+                                continue
+                            note = next((n for n in notes.values() if n["valor"] == valor), None)
+                            if note:
+                                note["quant"] += 1
+                            saldo += valor
+                            print(f"Saldo: {saldo:.2f}€")
             elif token.type == "SAIR":
                 if saldo > 0:
-                    troco=TROCO(saldo)
+                    troco = TROCO(saldo)
                     print(f"maq: Pode retirar o troco: {troco}")
-
                 print("maq: Até à próxima!")
+                save_to_json(file_path)
                 exit(0)
-                break
 
+def save_to_json(file_path: str):
+    data = {
+        "stock": list(stock.values()),
+        "moedas": list(coins.values()),
+        "notas": list(notes.values())
+    }
+    with open(file_path, 'w') as file:
+        json.dump(data, file, indent=4)
 
-def storage_machine(data: dict) -> None:
+def storage_machine(data: dict):
     for product in data["stock"]:
         stock[product["cod"]] = product
-    
     for coin in data["moedas"]:
         coins[coin["valor"]] = coin
-    
     for note in data["notas"]:
         notes[note["valor"]] = note
 
-
-
-def main(argv: list) -> None:
-
-    if len(argv) == 1:
+def main(argv: list):
+    if len(argv) != 2:
         print("Usage: python Vending_Machine.py <file_path>")
         return
-
     file_path = argv[1]
-
     try:
         with open(file_path, "r") as file:
             data = json.load(file)
-
         storage_machine(data)
-
     except FileNotFoundError:
         print(f"Error: File '{file_path}' not found.")
         return
-
-    vending_machine()
+    vending_machine(file_path)
 
 if __name__ == "__main__":
     main(sys.argv)
