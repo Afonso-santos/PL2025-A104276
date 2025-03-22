@@ -1,0 +1,278 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> geral
+Rule 1     geral -> expression
+Rule 2     expression -> term expres
+Rule 3     expres -> PLUS expression
+Rule 4     expres -> MINUS expression
+Rule 5     expres -> empty
+Rule 6     term -> factor termaux
+Rule 7     termaux -> TIMES term
+Rule 8     termaux -> DIVIDE term
+Rule 9     termaux -> empty
+Rule 10    factor -> LPAREN expression RPAREN
+Rule 11    factor -> NUMBER
+Rule 12    empty -> <empty>
+
+Terminals, with rules where they appear
+
+DIVIDE               : 8
+LPAREN               : 10
+MINUS                : 4
+NUMBER               : 11
+PLUS                 : 3
+RPAREN               : 10
+TIMES                : 7
+error                : 
+
+Nonterminals, with rules where they appear
+
+empty                : 5 9
+expres               : 2
+expression           : 1 3 4 10
+factor               : 6
+geral                : 0
+term                 : 2 7 8
+termaux              : 6
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . geral
+    (1) geral -> . expression
+    (2) expression -> . term expres
+    (6) term -> . factor termaux
+    (10) factor -> . LPAREN expression RPAREN
+    (11) factor -> . NUMBER
+
+    LPAREN          shift and go to state 5
+    NUMBER          shift and go to state 6
+
+    geral                          shift and go to state 1
+    expression                     shift and go to state 2
+    term                           shift and go to state 3
+    factor                         shift and go to state 4
+
+state 1
+
+    (0) S' -> geral .
+
+
+
+state 2
+
+    (1) geral -> expression .
+
+    $end            reduce using rule 1 (geral -> expression .)
+
+
+state 3
+
+    (2) expression -> term . expres
+    (3) expres -> . PLUS expression
+    (4) expres -> . MINUS expression
+    (5) expres -> . empty
+    (12) empty -> .
+
+    PLUS            shift and go to state 8
+    MINUS           shift and go to state 9
+    $end            reduce using rule 12 (empty -> .)
+    RPAREN          reduce using rule 12 (empty -> .)
+
+    expres                         shift and go to state 7
+    empty                          shift and go to state 10
+
+state 4
+
+    (6) term -> factor . termaux
+    (7) termaux -> . TIMES term
+    (8) termaux -> . DIVIDE term
+    (9) termaux -> . empty
+    (12) empty -> .
+
+    TIMES           shift and go to state 12
+    DIVIDE          shift and go to state 13
+    PLUS            reduce using rule 12 (empty -> .)
+    MINUS           reduce using rule 12 (empty -> .)
+    $end            reduce using rule 12 (empty -> .)
+    RPAREN          reduce using rule 12 (empty -> .)
+
+    termaux                        shift and go to state 11
+    empty                          shift and go to state 14
+
+state 5
+
+    (10) factor -> LPAREN . expression RPAREN
+    (2) expression -> . term expres
+    (6) term -> . factor termaux
+    (10) factor -> . LPAREN expression RPAREN
+    (11) factor -> . NUMBER
+
+    LPAREN          shift and go to state 5
+    NUMBER          shift and go to state 6
+
+    expression                     shift and go to state 15
+    term                           shift and go to state 3
+    factor                         shift and go to state 4
+
+state 6
+
+    (11) factor -> NUMBER .
+
+    TIMES           reduce using rule 11 (factor -> NUMBER .)
+    DIVIDE          reduce using rule 11 (factor -> NUMBER .)
+    PLUS            reduce using rule 11 (factor -> NUMBER .)
+    MINUS           reduce using rule 11 (factor -> NUMBER .)
+    $end            reduce using rule 11 (factor -> NUMBER .)
+    RPAREN          reduce using rule 11 (factor -> NUMBER .)
+
+
+state 7
+
+    (2) expression -> term expres .
+
+    $end            reduce using rule 2 (expression -> term expres .)
+    RPAREN          reduce using rule 2 (expression -> term expres .)
+
+
+state 8
+
+    (3) expres -> PLUS . expression
+    (2) expression -> . term expres
+    (6) term -> . factor termaux
+    (10) factor -> . LPAREN expression RPAREN
+    (11) factor -> . NUMBER
+
+    LPAREN          shift and go to state 5
+    NUMBER          shift and go to state 6
+
+    expression                     shift and go to state 16
+    term                           shift and go to state 3
+    factor                         shift and go to state 4
+
+state 9
+
+    (4) expres -> MINUS . expression
+    (2) expression -> . term expres
+    (6) term -> . factor termaux
+    (10) factor -> . LPAREN expression RPAREN
+    (11) factor -> . NUMBER
+
+    LPAREN          shift and go to state 5
+    NUMBER          shift and go to state 6
+
+    expression                     shift and go to state 17
+    term                           shift and go to state 3
+    factor                         shift and go to state 4
+
+state 10
+
+    (5) expres -> empty .
+
+    $end            reduce using rule 5 (expres -> empty .)
+    RPAREN          reduce using rule 5 (expres -> empty .)
+
+
+state 11
+
+    (6) term -> factor termaux .
+
+    PLUS            reduce using rule 6 (term -> factor termaux .)
+    MINUS           reduce using rule 6 (term -> factor termaux .)
+    $end            reduce using rule 6 (term -> factor termaux .)
+    RPAREN          reduce using rule 6 (term -> factor termaux .)
+
+
+state 12
+
+    (7) termaux -> TIMES . term
+    (6) term -> . factor termaux
+    (10) factor -> . LPAREN expression RPAREN
+    (11) factor -> . NUMBER
+
+    LPAREN          shift and go to state 5
+    NUMBER          shift and go to state 6
+
+    term                           shift and go to state 18
+    factor                         shift and go to state 4
+
+state 13
+
+    (8) termaux -> DIVIDE . term
+    (6) term -> . factor termaux
+    (10) factor -> . LPAREN expression RPAREN
+    (11) factor -> . NUMBER
+
+    LPAREN          shift and go to state 5
+    NUMBER          shift and go to state 6
+
+    term                           shift and go to state 19
+    factor                         shift and go to state 4
+
+state 14
+
+    (9) termaux -> empty .
+
+    PLUS            reduce using rule 9 (termaux -> empty .)
+    MINUS           reduce using rule 9 (termaux -> empty .)
+    $end            reduce using rule 9 (termaux -> empty .)
+    RPAREN          reduce using rule 9 (termaux -> empty .)
+
+
+state 15
+
+    (10) factor -> LPAREN expression . RPAREN
+
+    RPAREN          shift and go to state 20
+
+
+state 16
+
+    (3) expres -> PLUS expression .
+
+    $end            reduce using rule 3 (expres -> PLUS expression .)
+    RPAREN          reduce using rule 3 (expres -> PLUS expression .)
+
+
+state 17
+
+    (4) expres -> MINUS expression .
+
+    $end            reduce using rule 4 (expres -> MINUS expression .)
+    RPAREN          reduce using rule 4 (expres -> MINUS expression .)
+
+
+state 18
+
+    (7) termaux -> TIMES term .
+
+    PLUS            reduce using rule 7 (termaux -> TIMES term .)
+    MINUS           reduce using rule 7 (termaux -> TIMES term .)
+    $end            reduce using rule 7 (termaux -> TIMES term .)
+    RPAREN          reduce using rule 7 (termaux -> TIMES term .)
+
+
+state 19
+
+    (8) termaux -> DIVIDE term .
+
+    PLUS            reduce using rule 8 (termaux -> DIVIDE term .)
+    MINUS           reduce using rule 8 (termaux -> DIVIDE term .)
+    $end            reduce using rule 8 (termaux -> DIVIDE term .)
+    RPAREN          reduce using rule 8 (termaux -> DIVIDE term .)
+
+
+state 20
+
+    (10) factor -> LPAREN expression RPAREN .
+
+    TIMES           reduce using rule 10 (factor -> LPAREN expression RPAREN .)
+    DIVIDE          reduce using rule 10 (factor -> LPAREN expression RPAREN .)
+    PLUS            reduce using rule 10 (factor -> LPAREN expression RPAREN .)
+    MINUS           reduce using rule 10 (factor -> LPAREN expression RPAREN .)
+    $end            reduce using rule 10 (factor -> LPAREN expression RPAREN .)
+    RPAREN          reduce using rule 10 (factor -> LPAREN expression RPAREN .)
+
